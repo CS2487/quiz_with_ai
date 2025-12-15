@@ -399,7 +399,7 @@ class ProgrammingQuizApp {
         </main>
         
         <footer class="footer">
-          <p>Built with Clean Architecture • AI-Powered Analysis</p>
+          <p>Built with Clean Architecture • Farea AL-Dhelaa</p>
         </footer>
       </div>
     `;

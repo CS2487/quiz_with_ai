@@ -51,7 +51,7 @@ class ProgrammingQuizApp {
         </main>
         
         <footer class="footer">
-          <p>Built with Dart • AI-Powered Analysis</p>
+          <p>Built with Dart • Farea AL-Dhelaa</p>
         </footer>
       </div>
     ''', validator: _allowAllValidator());
