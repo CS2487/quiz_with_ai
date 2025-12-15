@@ -1,0 +1,984 @@
+class AppConstants {
+  static appName = 'Programming Quiz';
+  static questionsPerQuiz = 30;
+  static easyQuestions = 10;
+  static mediumQuestions = 10;
+  static hardQuestions = 10;
+  static defaultTimerSeconds = 30;
+}
+
+const Difficulty = {
+  BEGINNER: 'beginner',
+  INTERMEDIATE: 'intermediate',
+  ADVANCED: 'advanced'
+};
+
+const QuestionDifficulty = {
+  EASY: 'easy',
+  MEDIUM: 'medium',
+  HARD: 'hard'
+};
+
+class Technology {
+  constructor({ id, name, icon, difficulty, description, questionCount = 30 }) {
+    this.id = id;
+    this.name = name;
+    this.icon = icon;
+    this.difficulty = difficulty;
+    this.description = description;
+    this.questionCount = questionCount;
+  }
+}
+
+class Question {
+  constructor({ id, technologyId, questionText, codeSnippet, options, correctAnswers, difficulty, explanation }) {
+    this.id = id;
+    this.technologyId = technologyId;
+    this.questionText = questionText;
+    this.codeSnippet = codeSnippet;
+    this.options = options;
+    this.correctAnswers = correctAnswers;
+    this.difficulty = difficulty;
+    this.explanation = explanation;
+  }
+
+  get isMultipleChoice() {
+    return this.correctAnswers.length > 1;
+  }
+
+  checkAnswer(userAnswers) {
+    if (userAnswers.length !== this.correctAnswers.length) return false;
+    const sortedUser = [...userAnswers].sort();
+    const sortedCorrect = [...this.correctAnswers].sort();
+    for (let i = 0; i < sortedUser.length; i++) {
+      if (sortedUser[i] !== sortedCorrect[i]) return false;
+    }
+    return true;
+  }
+}
+
+class TechnologyDatasource {
+  static technologies = [
+    new Technology({ id: 'dart', name: 'Dart', icon: '🎯', difficulty: Difficulty.INTERMEDIATE, description: 'Modern language for building apps' }),
+    new Technology({ id: 'flutter', name: 'Flutter', icon: '💙', difficulty: Difficulty.INTERMEDIATE, description: 'Cross-platform UI framework' }),
+    new Technology({ id: 'java', name: 'Java', icon: '☕', difficulty: Difficulty.INTERMEDIATE, description: 'Enterprise programming language' }),
+    new Technology({ id: 'python', name: 'Python', icon: '🐍', difficulty: Difficulty.BEGINNER, description: 'Versatile scripting language' }),
+    new Technology({ id: 'javascript', name: 'JavaScript', icon: '⚡', difficulty: Difficulty.BEGINNER, description: 'Web programming language' }),
+    new Technology({ id: 'typescript', name: 'TypeScript', icon: '📘', difficulty: Difficulty.INTERMEDIATE, description: 'Typed JavaScript superset' }),
+    new Technology({ id: 'laravel', name: 'Laravel', icon: '🔴', difficulty: Difficulty.INTERMEDIATE, description: 'PHP web framework' }),
+    new Technology({ id: 'react', name: 'React', icon: '⚛️', difficulty: Difficulty.INTERMEDIATE, description: 'JavaScript UI library' }),
+    new Technology({ id: 'vue', name: 'Vue.js', icon: '💚', difficulty: Difficulty.BEGINNER, description: 'Progressive JS framework' }),
+    new Technology({ id: 'angular', name: 'Angular', icon: '🅰️', difficulty: Difficulty.ADVANCED, description: 'Full-featured web framework' }),
+    new Technology({ id: 'sql', name: 'SQL', icon: '🗄️', difficulty: Difficulty.BEGINNER, description: 'Database query language' }),
+    new Technology({ id: 'git', name: 'Git', icon: '📦', difficulty: Difficulty.BEGINNER, description: 'Version control system' }),
+    new Technology({ id: 'oop', name: 'OOP', icon: '🧱', difficulty: Difficulty.INTERMEDIATE, description: 'Object-Oriented Programming' }),
+    new Technology({ id: 'algorithms', name: 'Algorithms', icon: '🧮', difficulty: Difficulty.ADVANCED, description: 'Data structures & algorithms' }),
+    new Technology({ id: 'nodejs', name: 'Node.js', icon: '🟢', difficulty: Difficulty.INTERMEDIATE, description: 'JavaScript runtime' }),
+    new Technology({ id: 'rust', name: 'Rust', icon: '🦀', difficulty: Difficulty.ADVANCED, description: 'Systems programming language' }),
+    new Technology({ id: 'go', name: 'Go', icon: '🐹', difficulty: Difficulty.INTERMEDIATE, description: 'Cloud-native language' }),
+    new Technology({ id: 'kotlin', name: 'Kotlin', icon: '🟣', difficulty: Difficulty.INTERMEDIATE, description: 'Modern JVM language' }),
+    new Technology({ id: 'swift', name: 'Swift', icon: '🍎', difficulty: Difficulty.INTERMEDIATE, description: 'Apple development language' }),
+    new Technology({ id: 'csharp', name: 'C#', icon: '💜', difficulty: Difficulty.INTERMEDIATE, description: '.NET programming language' }),
+  ];
+
+  getAllTechnologies() {
+    return TechnologyDatasource.technologies;
+  }
+
+  getTechnologyById(id) {
+    return TechnologyDatasource.technologies.find(t => t.id === id);
+  }
+}
+
+class QuestionBank {
+  static questions = {};
+
+  static {
+    QuestionBank.questions['dart'] = QuestionBank.generateDartQuestions();
+    QuestionBank.questions['flutter'] = QuestionBank.generateFlutterQuestions();
+    QuestionBank.questions['java'] = QuestionBank.generateJavaQuestions();
+    QuestionBank.questions['python'] = QuestionBank.generatePythonQuestions();
+    QuestionBank.questions['javascript'] = QuestionBank.generateJavaScriptQuestions();
+
+    const otherTechs = ['typescript', 'laravel', 'react', 'vue', 'angular', 'sql', 'git', 'oop', 'algorithms', 'nodejs', 'rust', 'go', 'kotlin', 'swift', 'csharp'];
+    const techNames = { typescript: 'TypeScript', laravel: 'Laravel', react: 'React', vue: 'Vue.js', angular: 'Angular', sql: 'SQL', git: 'Git', oop: 'OOP', algorithms: 'Algorithms', nodejs: 'Node.js', rust: 'Rust', go: 'Go', kotlin: 'Kotlin', swift: 'Swift', csharp: 'C#' };
+    
+    otherTechs.forEach(tech => {
+      QuestionBank.questions[tech] = QuestionBank.generateGenericQuestions(tech, techNames[tech]);
+    });
+  }
+
+  static generateDartQuestions() {
+    return [
+      new Question({ id: 'dart_e1', technologyId: 'dart', questionText: 'What keyword is used to declare a variable in Dart?', options: ['var', 'let', 'dim', 'variable'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'In Dart, "var" is used to declare a variable with type inference.' }),
+      new Question({ id: 'dart_e2', technologyId: 'dart', questionText: 'Which symbol is used for string interpolation in Dart?', options: ['$', '#', '@', '&'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Dart uses $ for string interpolation.' }),
+      new Question({ id: 'dart_e3', technologyId: 'dart', questionText: 'What is the entry point of a Dart program?', options: ['main()', 'start()', 'run()', 'init()'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'The main() function is the entry point of every Dart program.' }),
+      new Question({ id: 'dart_e4', technologyId: 'dart', questionText: 'Which keyword makes a variable immutable in Dart?', options: ['final', 'const', 'Both final and const', 'immutable'], correctAnswers: [2], difficulty: QuestionDifficulty.EASY, explanation: 'Both final and const create immutable variables.' }),
+      new Question({ id: 'dart_e5', technologyId: 'dart', questionText: 'What is the default value of an uninitialized variable in Dart?', options: ['null', '0', 'undefined', 'empty'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Uninitialized variables in Dart have a default value of null.' }),
+      new Question({ id: 'dart_e6', technologyId: 'dart', questionText: 'Which data type is used for whole numbers in Dart?', options: ['int', 'number', 'integer', 'long'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'int is the data type for whole numbers in Dart.' }),
+      new Question({ id: 'dart_e7', technologyId: 'dart', questionText: 'How do you create a list in Dart?', options: ['[]', '{}', '()', '<>'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Square brackets [] are used to create a list in Dart.' }),
+      new Question({ id: 'dart_e8', technologyId: 'dart', questionText: 'What operator is used for null-aware access in Dart?', options: ['?.', '??', '?:', '?!'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'The ?. operator is used for null-aware member access.' }),
+      new Question({ id: 'dart_e9', technologyId: 'dart', questionText: 'Which keyword is used to define a class in Dart?', options: ['class', 'Class', 'struct', 'object'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'The class keyword is used to define a class in Dart.' }),
+      new Question({ id: 'dart_e10', technologyId: 'dart', questionText: 'What is the correct way to print output in Dart?', options: ['print()', 'console.log()', 'System.out.println()', 'echo()'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'print() is the function used to output text in Dart.' }),
+      new Question({ id: 'dart_e11', technologyId: 'dart', questionText: 'Which collection type stores unique values in Dart?', options: ['Set', 'List', 'Map', 'Array'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Set stores unique values.' }),
+      new Question({ id: 'dart_e12', technologyId: 'dart', questionText: 'What is the boolean type called in Dart?', options: ['bool', 'boolean', 'Boolean', 'bit'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'bool is the boolean type in Dart.' }),
+      new Question({ id: 'dart_m1', technologyId: 'dart', questionText: 'What is the difference between "final" and "const" in Dart?', options: ['final is runtime constant, const is compile-time constant', 'They are exactly the same', 'const is runtime constant, final is compile-time constant', 'final is for classes, const is for variables'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'final variables can be set once at runtime, while const must be known at compile time.' }),
+      new Question({ id: 'dart_m2', technologyId: 'dart', questionText: 'What is a Future in Dart?', options: ['A value that will be available later', 'A type of list', 'A loop construct', 'A class modifier'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Future represents a potential value that will be available at some time in the future.' }),
+      new Question({ id: 'dart_m3', technologyId: 'dart', questionText: 'Which keyword is used for asynchronous functions in Dart?', options: ['async', 'await', 'future', 'defer'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'The async keyword marks a function as asynchronous.' }),
+      new Question({ id: 'dart_m4', technologyId: 'dart', questionText: 'What is a mixin in Dart?', options: ['A way to reuse code in multiple class hierarchies', 'A type of variable', 'A testing framework', 'A package manager'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Mixins allow you to reuse code in multiple class hierarchies.' }),
+      new Question({ id: 'dart_m5', technologyId: 'dart', questionText: 'What does the "late" keyword do in Dart?', options: ['Delays initialization of a non-nullable variable', 'Makes a variable lazy', 'Creates a timer', 'Marks deprecated code'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'late allows you to declare a non-nullable variable that will be initialized later.' }),
+      new Question({ id: 'dart_m6', technologyId: 'dart', questionText: 'What is the purpose of the "with" keyword in Dart?', options: ['To apply mixins', 'To import packages', 'To create constructors', 'To define interfaces'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'The with keyword is used to apply mixins to a class.' }),
+      new Question({ id: 'dart_m7', technologyId: 'dart', questionText: 'What is a Stream in Dart?', options: ['A sequence of asynchronous events', 'A file handler', 'A type of list', 'A network socket'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Stream provides a sequence of asynchronous data events.' }),
+      new Question({ id: 'dart_m8', technologyId: 'dart', questionText: 'How do you create a named constructor in Dart?', options: ['ClassName.constructorName()', 'new ClassName()', 'constructor ClassName()', 'def ClassName()'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Named constructors use the syntax ClassName.constructorName().' }),
+      new Question({ id: 'dart_m9', technologyId: 'dart', questionText: 'What is the ?? operator called in Dart?', options: ['Null-coalescing operator', 'Ternary operator', 'Elvis operator', 'Spread operator'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'The ?? operator is called the null-coalescing operator.' }),
+      new Question({ id: 'dart_m10', technologyId: 'dart', questionText: 'What does the "required" keyword do in Dart?', options: ['Makes a named parameter mandatory', 'Makes a class abstract', 'Imports a package', 'Creates a constant'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'required makes a named parameter mandatory in function calls.' }),
+      new Question({ id: 'dart_m11', technologyId: 'dart', questionText: 'What is an extension method in Dart?', options: ['A way to add functionality to existing classes', 'A type of inheritance', 'A testing utility', 'A build tool'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Extension methods allow you to add new functionality to existing libraries and classes.' }),
+      new Question({ id: 'dart_m12', technologyId: 'dart', questionText: 'What is the purpose of factory constructor?', options: ['To return existing instances or subtypes', 'To create abstract classes', 'To define interfaces', 'To import modules'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Factory constructors can return existing instances, cached instances, or instances of subtypes.' }),
+      new Question({ id: 'dart_h1', technologyId: 'dart', questionText: 'What is an Isolate in Dart?', options: ['A separate thread with its own memory heap', 'A package manager', 'A testing framework', 'A UI component'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Isolates are independent workers that don\'t share memory, enabling true parallelism.' }),
+      new Question({ id: 'dart_h2', technologyId: 'dart', questionText: 'What is sound null safety in Dart?', options: ['Compile-time guarantees that non-nullable types cannot be null', 'A sound library', 'Runtime null checking', 'A testing tool'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Sound null safety provides compile-time guarantees that expressions of non-nullable types cannot evaluate to null.' }),
+      new Question({ id: 'dart_h3', technologyId: 'dart', questionText: 'What is the difference between "implements" and "extends" in Dart?', options: ['implements requires all methods to be implemented, extends inherits them', 'They are identical', 'extends is for interfaces, implements is for classes', 'implements is deprecated'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'implements treats the class as an interface requiring all methods to be implemented, while extends inherits functionality.' }),
+      new Question({ id: 'dart_h4', technologyId: 'dart', questionText: 'What is covariant in Dart?', options: ['Allows a parameter type to be a subtype in overriding methods', 'A type of variable', 'A testing framework', 'A null safety feature'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'covariant allows you to override a method parameter with a more specific type.' }),
+      new Question({ id: 'dart_h5', technologyId: 'dart', questionText: 'What is the cascade notation (..) used for in Dart?', options: ['To perform multiple operations on the same object', 'To create ranges', 'To define spread operators', 'To import packages'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Cascade notation allows you to make a sequence of operations on the same object.' }),
+      new Question({ id: 'dart_h6', technologyId: 'dart', questionText: 'What is a sealed class in Dart?', options: ['A class that can only be extended in the same library', 'A final class', 'An abstract class', 'A deprecated class'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Sealed classes restrict subclassing to the same library, enabling exhaustive pattern matching.' }),
+      new Question({ id: 'dart_h7', technologyId: 'dart', questionText: 'What is the Zone in Dart?', options: ['An execution context that persists across async calls', 'A memory region', 'A UI component', 'A package scope'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Zone is an execution context that persists across asynchronous operations.' }),
+      new Question({ id: 'dart_h8', technologyId: 'dart', questionText: 'How do you implement operator overloading in Dart?', options: ['Using the operator keyword before the operator symbol', 'Using @override annotation', 'Using extension methods', 'Not possible in Dart'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Dart allows operator overloading using the operator keyword.' }),
+      new Question({ id: 'dart_h9', technologyId: 'dart', questionText: 'What are records in Dart?', options: ['Anonymous immutable aggregate types', 'Database records', 'Audio recordings', 'Log entries'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Records are anonymous, immutable, aggregate types for bundling multiple objects into a single value.' }),
+      new Question({ id: 'dart_h10', technologyId: 'dart', questionText: 'What is pattern matching in Dart 3?', options: ['A way to destructure and match values against patterns', 'Regular expressions', 'String matching', 'File pattern globbing'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Pattern matching allows destructuring objects and matching against patterns in switch statements.' }),
+      new Question({ id: 'dart_h11', technologyId: 'dart', questionText: 'What is the purpose of @pragma annotation in Dart?', options: ['To give hints to the compiler or tools', 'To mark deprecated code', 'To define constants', 'To create documentation'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: '@pragma provides hints to the Dart compiler and other tools for optimization.' }),
+      new Question({ id: 'dart_h12', technologyId: 'dart', questionText: 'What is tree shaking in Dart?', options: ['Removing unused code during compilation', 'A debugging technique', 'Memory management', 'Package installation'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Tree shaking removes unused code from the final compiled output to reduce bundle size.' }),
+    ];
+  }
+
+  static generateFlutterQuestions() {
+    return [
+      new Question({ id: 'flutter_e1', technologyId: 'flutter', questionText: 'What is the base class for all widgets in Flutter?', options: ['Widget', 'Component', 'View', 'Element'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Widget is the base class for all UI elements in Flutter.' }),
+      new Question({ id: 'flutter_e2', technologyId: 'flutter', questionText: 'What method must be overridden in a StatelessWidget?', options: ['build()', 'render()', 'create()', 'init()'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'The build() method must be overridden to describe the widget UI.' }),
+      new Question({ id: 'flutter_e3', technologyId: 'flutter', questionText: 'Which widget is used to display text in Flutter?', options: ['Text', 'Label', 'TextView', 'Span'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'The Text widget is used to display text in Flutter.' }),
+      new Question({ id: 'flutter_e4', technologyId: 'flutter', questionText: 'What is the purpose of the Scaffold widget?', options: ['Provides basic material design layout structure', 'Creates animations', 'Handles routing', 'Manages state'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Scaffold provides the basic Material Design visual layout structure.' }),
+      new Question({ id: 'flutter_e5', technologyId: 'flutter', questionText: 'Which widget is used to arrange children horizontally?', options: ['Row', 'Column', 'Stack', 'Wrap'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Row widget arranges its children in a horizontal array.' }),
+      new Question({ id: 'flutter_e6', technologyId: 'flutter', questionText: 'What is the purpose of the Container widget?', options: ['Combines common painting, positioning, and sizing', 'Only for text', 'Only for images', 'Only for buttons'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Container combines common painting, positioning, and sizing widgets.' }),
+      new Question({ id: 'flutter_e7', technologyId: 'flutter', questionText: 'Which widget is used to make content scrollable?', options: ['SingleChildScrollView', 'Scrollable', 'ScrollView', 'Scroller'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'SingleChildScrollView makes its single child scrollable.' }),
+      new Question({ id: 'flutter_e8', technologyId: 'flutter', questionText: 'What is hot reload in Flutter?', options: ['Quickly see code changes without restarting the app', 'A performance optimization', 'A debugging tool', 'A testing feature'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Hot reload allows you to see code changes instantly without losing app state.' }),
+      new Question({ id: 'flutter_e9', technologyId: 'flutter', questionText: 'Which widget displays an image from the network?', options: ['Image.network()', 'NetworkImage()', 'WebImage()', 'UrlImage()'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Image.network() is used to display images from a URL.' }),
+      new Question({ id: 'flutter_e10', technologyId: 'flutter', questionText: 'What is the main function of a StatefulWidget?', options: ['Creates widgets that can change over time', 'Creates static layouts', 'Handles routing', 'Manages databases'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'StatefulWidget creates widgets that can maintain mutable state.' }),
+      new Question({ id: 'flutter_e11', technologyId: 'flutter', questionText: 'Which widget adds padding around a child?', options: ['Padding', 'Margin', 'Space', 'Inset'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Padding widget adds space around its child.' }),
+      new Question({ id: 'flutter_e12', technologyId: 'flutter', questionText: 'What is the purpose of MaterialApp?', options: ['Sets up Material Design theming and navigation', 'Creates buttons', 'Handles HTTP requests', 'Manages files'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'MaterialApp sets up the root of a Material Design app with theming and navigation.' }),
+      new Question({ id: 'flutter_m1', technologyId: 'flutter', questionText: 'What is the purpose of setState() in Flutter?', options: ['Notifies the framework that internal state has changed', 'Sets global state', 'Initializes state', 'Destroys state'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'setState() notifies the framework that state has changed and triggers a rebuild.' }),
+      new Question({ id: 'flutter_m2', technologyId: 'flutter', questionText: 'What is the difference between Expanded and Flexible?', options: ['Expanded fills all available space, Flexible can control how much', 'They are identical', 'Flexible is deprecated', 'Expanded is for rows only'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Expanded is a Flexible with fit: FlexFit.tight, meaning it fills all available space.' }),
+      new Question({ id: 'flutter_m3', technologyId: 'flutter', questionText: 'What is the purpose of GlobalKey?', options: ['Uniquely identifies widgets across the entire app', 'Creates global variables', 'Encrypts data', 'Handles localization'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'GlobalKey uniquely identifies widgets across the app and allows access to their state.' }),
+      new Question({ id: 'flutter_m4', technologyId: 'flutter', questionText: 'What is the Navigator in Flutter?', options: ['Manages a stack of Route objects for screen navigation', 'A search widget', 'A map widget', 'A menu component'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Navigator manages a stack of Route objects and provides methods for navigation.' }),
+      new Question({ id: 'flutter_m5', technologyId: 'flutter', questionText: 'What lifecycle method is called when a StatefulWidget is inserted into the tree?', options: ['initState()', 'build()', 'didChangeDependencies()', 'createState()'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'initState() is called once when the State object is first created.' }),
+      new Question({ id: 'flutter_m6', technologyId: 'flutter', questionText: 'What is the purpose of FutureBuilder?', options: ['Builds widgets based on async Future results', 'Creates Future objects', 'Schedules tasks', 'Handles errors'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'FutureBuilder builds itself based on the latest snapshot of a Future.' }),
+      new Question({ id: 'flutter_m7', technologyId: 'flutter', questionText: 'What is InheritedWidget used for?', options: ['Efficiently propagating data down the widget tree', 'Creating inheritance hierarchies', 'Handling events', 'Managing routes'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'InheritedWidget efficiently propagates data to descendants.' }),
+      new Question({ id: 'flutter_m8', technologyId: 'flutter', questionText: 'What is the purpose of Keys in Flutter?', options: ['Preserve widget state and identity during rebuilds', 'Encrypt data', 'Store passwords', 'Access APIs'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Keys preserve state and identity of widgets during rebuilds.' }),
+      new Question({ id: 'flutter_m9', technologyId: 'flutter', questionText: 'What is the difference between Stack and Positioned?', options: ['Stack layers children, Positioned places them at specific locations', 'They are the same', 'Stack is deprecated', 'Positioned is for lists'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Stack overlays children, Positioned specifies exact positions within the Stack.' }),
+      new Question({ id: 'flutter_m10', technologyId: 'flutter', questionText: 'What is the purpose of StreamBuilder?', options: ['Builds widgets reactively from Stream data', 'Creates Streams', 'Plays media', 'Handles files'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'StreamBuilder builds itself based on the latest snapshot of async Stream interaction.' }),
+      new Question({ id: 'flutter_m11', technologyId: 'flutter', questionText: 'What is the difference between mainAxisAlignment and crossAxisAlignment?', options: ['mainAxis is along the primary direction, crossAxis is perpendicular', 'They are identical', 'mainAxis is for Column only', 'crossAxis is deprecated'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'mainAxisAlignment aligns along the primary axis, crossAxisAlignment aligns perpendicular to it.' }),
+      new Question({ id: 'flutter_m12', technologyId: 'flutter', questionText: 'What widget is used for handling touch gestures?', options: ['GestureDetector', 'TouchHandler', 'TapWidget', 'EventListener'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'GestureDetector detects gestures like tap, drag, and scale.' }),
+      new Question({ id: 'flutter_h1', technologyId: 'flutter', questionText: 'What is the difference between Element and Widget in Flutter?', options: ['Widget is immutable configuration, Element is mutable instance in the tree', 'They are the same', 'Element is deprecated', 'Widget is for testing only'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Widgets are immutable descriptions; Elements are mutable objects in the actual tree.' }),
+      new Question({ id: 'flutter_h2', technologyId: 'flutter', questionText: 'What is a RenderObject in Flutter?', options: ['Handles layout, painting, and hit testing', 'A 3D object', 'A network object', 'A database object'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'RenderObject handles layout, painting, and hit testing for visual elements.' }),
+      new Question({ id: 'flutter_h3', technologyId: 'flutter', questionText: 'What is the purpose of CustomPainter?', options: ['Draws custom graphics using Canvas', 'Paints walls', 'Creates themes', 'Handles animations'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'CustomPainter allows drawing custom graphics directly on a Canvas.' }),
+      new Question({ id: 'flutter_h4', technologyId: 'flutter', questionText: 'What is Sliver in Flutter?', options: ['A portion of scrollable area with custom scrolling effects', 'A thin widget', 'A testing tool', 'A package manager'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Slivers are portions of scrollable areas that implement custom scroll effects.' }),
+      new Question({ id: 'flutter_h5', technologyId: 'flutter', questionText: 'What is the BuildContext?', options: ['A handle to the location of a widget in the widget tree', 'A build tool', 'A testing context', 'A package scope'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'BuildContext is a handle to the location of a widget in the widget tree.' }),
+      new Question({ id: 'flutter_h6', technologyId: 'flutter', questionText: 'What is the purpose of RepaintBoundary?', options: ['Isolates painting to optimize performance', 'Creates borders', 'Handles repaints', 'Manages memory'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'RepaintBoundary creates a separate display list to optimize repainting.' }),
+      new Question({ id: 'flutter_h7', technologyId: 'flutter', questionText: 'What is the difference between const and final widgets?', options: ['const widgets are compile-time constants that can be reused', 'They are identical', 'final widgets are faster', 'const is deprecated'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'const widgets are canonical and reused, reducing memory and improving performance.' }),
+      new Question({ id: 'flutter_h8', technologyId: 'flutter', questionText: 'What is WidgetsBindingObserver used for?', options: ['Observing app lifecycle and system events', 'Binding widgets', 'Testing widgets', 'Creating bindings'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'WidgetsBindingObserver allows observing app lifecycle changes and system events.' }),
+      new Question({ id: 'flutter_h9', technologyId: 'flutter', questionText: 'What is the purpose of LayoutBuilder?', options: ['Builds widgets based on parent constraints', 'Creates layouts', 'Builds databases', 'Handles navigation'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'LayoutBuilder provides parent constraints to build responsive layouts.' }),
+      new Question({ id: 'flutter_h10', technologyId: 'flutter', questionText: 'What is Platform Channel in Flutter?', options: ['Mechanism to call native platform code from Dart', 'A TV channel', 'A build channel', 'A test channel'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Platform Channels enable communication between Dart and native platform code.' }),
+      new Question({ id: 'flutter_h11', technologyId: 'flutter', questionText: 'What is the purpose of Semantics widget?', options: ['Provides accessibility information for screen readers', 'Creates meaning', 'Handles localization', 'Manages themes'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Semantics widget provides accessibility information for assistive technologies.' }),
+      new Question({ id: 'flutter_h12', technologyId: 'flutter', questionText: 'What is deferred loading in Flutter?', options: ['Loading parts of the app on demand to reduce initial load time', 'Lazy loading images', 'Delayed initialization', 'Background loading'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Deferred loading splits the app into chunks loaded on demand, reducing initial download size.' }),
+    ];
+  }
+
+  static generateJavaQuestions() {
+    return [
+      new Question({ id: 'java_e1', technologyId: 'java', questionText: 'What is the correct way to declare a main method in Java?', options: ['public static void main(String[] args)', 'void main()', 'static main(String args)', 'public main()'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'The main method signature in Java is public static void main(String[] args).' }),
+      new Question({ id: 'java_e2', technologyId: 'java', questionText: 'Which keyword is used to create an object in Java?', options: ['new', 'create', 'instance', 'object'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'The new keyword is used to instantiate objects in Java.' }),
+      new Question({ id: 'java_e3', technologyId: 'java', questionText: 'What is the default value of an int variable in Java?', options: ['0', 'null', 'undefined', '-1'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'The default value for int in Java is 0.' }),
+      new Question({ id: 'java_e4', technologyId: 'java', questionText: 'Which keyword is used to inherit a class in Java?', options: ['extends', 'implements', 'inherits', 'super'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'The extends keyword is used for class inheritance.' }),
+      new Question({ id: 'java_e5', technologyId: 'java', questionText: 'What is the size of int in Java?', options: ['32 bits', '16 bits', '64 bits', '8 bits'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'int in Java is always 32 bits regardless of platform.' }),
+      new Question({ id: 'java_e6', technologyId: 'java', questionText: 'Which access modifier makes a member accessible only within the class?', options: ['private', 'public', 'protected', 'default'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'private restricts access to within the class only.' }),
+      new Question({ id: 'java_e7', technologyId: 'java', questionText: 'What is the correct file extension for Java source files?', options: ['.java', '.class', '.jar', '.jav'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Java source files use the .java extension.' }),
+      new Question({ id: 'java_e8', technologyId: 'java', questionText: 'Which loop is guaranteed to execute at least once?', options: ['do-while', 'while', 'for', 'foreach'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'do-while loop executes the body first, then checks the condition.' }),
+      new Question({ id: 'java_e9', technologyId: 'java', questionText: 'What is the parent class of all classes in Java?', options: ['Object', 'Class', 'Base', 'Parent'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Object is the root of the class hierarchy in Java.' }),
+      new Question({ id: 'java_e10', technologyId: 'java', questionText: 'Which collection class allows duplicate elements?', options: ['ArrayList', 'HashSet', 'TreeSet', 'LinkedHashSet'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'ArrayList allows duplicate elements; Sets do not.' }),
+      new Question({ id: 'java_e11', technologyId: 'java', questionText: 'What is the operator for string concatenation in Java?', options: ['+', '&', '.', ','], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'The + operator is used for string concatenation.' }),
+      new Question({ id: 'java_e12', technologyId: 'java', questionText: 'Which keyword is used to define a constant in Java?', options: ['final', 'const', 'static', 'constant'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'final keyword makes a variable constant in Java.' }),
+      new Question({ id: 'java_m1', technologyId: 'java', questionText: 'What is the difference between == and equals() in Java?', options: ['== compares references, equals() compares content', 'They are identical', '== is for primitives only', 'equals() is deprecated'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: '== compares object references, equals() compares the content of objects.' }),
+      new Question({ id: 'java_m2', technologyId: 'java', questionText: 'What is method overloading?', options: ['Multiple methods with the same name but different parameters', 'Overriding parent methods', 'Loading methods at runtime', 'Method caching'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Overloading is having multiple methods with the same name but different parameter lists.' }),
+      new Question({ id: 'java_m3', technologyId: 'java', questionText: 'What is the purpose of the static keyword?', options: ['Indicates a member belongs to the class rather than instances', 'Makes variables constant', 'Creates new objects', 'Handles exceptions'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'static members belong to the class itself, not to any specific instance.' }),
+      new Question({ id: 'java_m4', technologyId: 'java', questionText: 'What is an interface in Java?', options: ['A contract defining methods a class must implement', 'A type of class', 'A package', 'A variable type'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Interfaces define a contract of methods that implementing classes must provide.' }),
+      new Question({ id: 'java_m5', technologyId: 'java', questionText: 'What is the purpose of try-catch block?', options: ['To handle exceptions', 'To test code', 'To loop code', 'To define methods'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'try-catch blocks handle exceptions and prevent program crashes.' }),
+      new Question({ id: 'java_m6', technologyId: 'java', questionText: 'What is autoboxing in Java?', options: ['Automatic conversion between primitives and wrapper classes', 'Boxing algorithms', 'Memory allocation', 'Package management'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Autoboxing automatically converts primitives to their wrapper class equivalents.' }),
+      new Question({ id: 'java_m7', technologyId: 'java', questionText: 'What is a lambda expression in Java?', options: ['A short way to represent an anonymous function', 'A mathematical expression', 'A loop type', 'A class type'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Lambda expressions provide a concise way to represent single-method interfaces.' }),
+      new Question({ id: 'java_m8', technologyId: 'java', questionText: 'What is the purpose of the synchronized keyword?', options: ['To control access to shared resources by multiple threads', 'To sync files', 'To import packages', 'To define constants'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'synchronized prevents multiple threads from accessing shared resources simultaneously.' }),
+      new Question({ id: 'java_m9', technologyId: 'java', questionText: 'What is the difference between ArrayList and LinkedList?', options: ['ArrayList uses array, LinkedList uses doubly linked list', 'They are identical', 'ArrayList is deprecated', 'LinkedList is faster for random access'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'ArrayList provides fast random access, LinkedList provides fast insertion/deletion.' }),
+      new Question({ id: 'java_m10', technologyId: 'java', questionText: 'What is the purpose of the super keyword?', options: ['To refer to the parent class', 'To create superclasses', 'To make variables superior', 'To define interfaces'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'super refers to the immediate parent class, used to call parent methods and constructors.' }),
+      new Question({ id: 'java_m11', technologyId: 'java', questionText: 'What is a Stream in Java 8?', options: ['A sequence of elements supporting functional-style operations', 'A file stream', 'A network stream', 'A video stream'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Stream API provides functional-style operations on collections of elements.' }),
+      new Question({ id: 'java_m12', technologyId: 'java', questionText: 'What is the difference between abstract class and interface?', options: ['Abstract class can have implementations, interface traditionally cannot', 'They are identical', 'Interface can have state', 'Abstract class is faster'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Abstract classes can have implemented methods and state; interfaces define contracts.' }),
+      new Question({ id: 'java_h1', technologyId: 'java', questionText: 'What is the Java Memory Model?', options: ['Specification defining how threads interact through memory', 'Physical memory layout', 'Garbage collection strategy', 'Class loading mechanism'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'JMM specifies how threads interact through memory and what behaviors are allowed.' }),
+      new Question({ id: 'java_h2', technologyId: 'java', questionText: 'What is the purpose of volatile keyword?', options: ['Ensures visibility of changes across threads', 'Makes variables faster', 'Creates temporary variables', 'Handles exceptions'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'volatile ensures that changes to a variable are visible to all threads.' }),
+      new Question({ id: 'java_h3', technologyId: 'java', questionText: 'What is reflection in Java?', options: ['Ability to inspect and modify runtime behavior', 'Mirror effect', 'Code duplication', 'Testing technique'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Reflection allows examining and modifying class structure and behavior at runtime.' }),
+      new Question({ id: 'java_h4', technologyId: 'java', questionText: 'What is the difference between ClassNotFoundException and NoClassDefFoundError?', options: ['ClassNotFoundException is checked exception, NoClassDefFoundError is error occurring when class was present at compile time but not runtime', 'They are identical', 'NoClassDefFoundError is checked', 'ClassNotFoundException is for missing methods'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'ClassNotFoundException occurs when loading a class dynamically; NoClassDefFoundError when a class was available at compile time but not at runtime.' }),
+      new Question({ id: 'java_h5', technologyId: 'java', questionText: 'What is the purpose of the transient keyword?', options: ['Excludes field from serialization', 'Makes variables temporary', 'Creates transitions', 'Handles transactions'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'transient fields are not serialized when the object is serialized.' }),
+      new Question({ id: 'java_h6', technologyId: 'java', questionText: 'What is a WeakReference in Java?', options: ['A reference that does not prevent garbage collection', 'A slow reference', 'A broken reference', 'A null reference'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'WeakReference allows the referenced object to be garbage collected.' }),
+      new Question({ id: 'java_h7', technologyId: 'java', questionText: 'What is the Fork/Join Framework?', options: ['Framework for parallel execution of divide-and-conquer tasks', 'A testing framework', 'A GUI framework', 'A database framework'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Fork/Join framework efficiently executes parallel divide-and-conquer algorithms.' }),
+      new Question({ id: 'java_h8', technologyId: 'java', questionText: 'What is the purpose of CompletableFuture?', options: ['Represents a future result of async computation with composition', 'A complete future', 'A finished task', 'A timeout handler'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'CompletableFuture enables composable asynchronous programming.' }),
+      new Question({ id: 'java_h9', technologyId: 'java', questionText: 'What is escape analysis in the JVM?', options: ['Optimization technique determining if objects can be allocated on stack', 'Security analysis', 'String escaping', 'Exception analysis'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Escape analysis determines if objects can be allocated on stack instead of heap.' }),
+      new Question({ id: 'java_h10', technologyId: 'java', questionText: 'What is the difference between Class.forName() and ClassLoader.loadClass()?', options: ['forName() initializes the class, loadClass() does not by default', 'They are identical', 'loadClass() is deprecated', 'forName() is faster'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Class.forName() initializes static blocks; loadClass() only loads the class.' }),
+      new Question({ id: 'java_h11', technologyId: 'java', questionText: 'What is Project Loom in Java?', options: ['Virtual threads for lightweight concurrency', 'A weaving project', 'A testing framework', 'A build tool'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Project Loom introduces virtual threads for scalable lightweight concurrency.' }),
+      new Question({ id: 'java_h12', technologyId: 'java', questionText: 'What is a sealed class in Java?', options: ['A class that restricts which classes can extend it', 'An encrypted class', 'A final class', 'An abstract class'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Sealed classes specify exactly which classes may extend or implement them.' }),
+    ];
+  }
+
+  static generatePythonQuestions() {
+    return [
+      new Question({ id: 'python_e1', technologyId: 'python', questionText: 'What is the correct way to start a Python comment?', options: ['#', '//', '/*', '--'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Python uses # for single-line comments.' }),
+      new Question({ id: 'python_e2', technologyId: 'python', questionText: 'Which keyword is used to define a function in Python?', options: ['def', 'function', 'func', 'fn'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'def keyword is used to define functions in Python.' }),
+      new Question({ id: 'python_e3', technologyId: 'python', questionText: 'How do you create a list in Python?', options: ['[]', '{}', '()', '<>'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Square brackets [] are used to create lists in Python.' }),
+      new Question({ id: 'python_e4', technologyId: 'python', questionText: 'What is the output of print(2 ** 3)?', options: ['8', '6', '5', '9'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: '** is the exponentiation operator; 2^3 = 8.' }),
+      new Question({ id: 'python_e5', technologyId: 'python', questionText: 'Which data type is immutable in Python?', options: ['tuple', 'list', 'dictionary', 'set'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Tuples are immutable; their content cannot be changed after creation.' }),
+      new Question({ id: 'python_e6', technologyId: 'python', questionText: 'How do you get user input in Python?', options: ['input()', 'read()', 'get()', 'scan()'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'input() function reads user input from the console.' }),
+      new Question({ id: 'python_e7', technologyId: 'python', questionText: 'What is the correct way to create a dictionary?', options: ['{"key": "value"}', '["key": "value"]', '("key": "value")', '<"key": "value">'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Curly braces with key-value pairs create dictionaries.' }),
+      new Question({ id: 'python_e8', technologyId: 'python', questionText: 'Which keyword is used for conditional statements?', options: ['if', 'when', 'case', 'switch'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'if keyword is used for conditional statements in Python.' }),
+      new Question({ id: 'python_e9', technologyId: 'python', questionText: 'What does len() function do?', options: ['Returns the length of an object', 'Creates a length', 'Extends an object', 'Shortens an object'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'len() returns the number of items in an object.' }),
+      new Question({ id: 'python_e10', technologyId: 'python', questionText: 'How do you import a module in Python?', options: ['import module_name', 'include module_name', 'using module_name', 'require module_name'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'import keyword is used to import modules.' }),
+      new Question({ id: 'python_e11', technologyId: 'python', questionText: 'What is the boolean type in Python?', options: ['bool', 'boolean', 'Boolean', 'bit'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'bool is the boolean type in Python (True/False).' }),
+      new Question({ id: 'python_e12', technologyId: 'python', questionText: 'Which symbol is used for string concatenation?', options: ['+', '&', '.', ','], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'The + operator concatenates strings in Python.' }),
+      new Question({ id: 'python_m1', technologyId: 'python', questionText: 'What is a list comprehension?', options: ['A concise way to create lists', 'A list explanation', 'A documentation tool', 'A testing method'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'List comprehensions provide a concise way to create lists based on existing lists.' }),
+      new Question({ id: 'python_m2', technologyId: 'python', questionText: 'What is the purpose of *args in function definition?', options: ['Allows passing variable number of positional arguments', 'Creates a pointer', 'Multiplies arguments', 'Imports all'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: '*args allows a function to accept any number of positional arguments.' }),
+      new Question({ id: 'python_m3', technologyId: 'python', questionText: 'What is a decorator in Python?', options: ['A function that modifies another function', 'A design pattern', 'A commenting style', 'A variable type'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Decorators are functions that modify the behavior of other functions.' }),
+      new Question({ id: 'python_m4', technologyId: 'python', questionText: 'What is the difference between shallow copy and deep copy?', options: ['Shallow copies references, deep copy creates new objects recursively', 'They are identical', 'Deep copy is faster', 'Shallow copy uses more memory'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Shallow copy copies references; deep copy recursively creates new objects.' }),
+      new Question({ id: 'python_m5', technologyId: 'python', questionText: 'What is a generator in Python?', options: ['A function that yields values one at a time', 'A random number creator', 'A class constructor', 'A loop type'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Generators yield values lazily, one at a time, saving memory.' }),
+      new Question({ id: 'python_m6', technologyId: 'python', questionText: 'What is the purpose of __init__ method?', options: ['Constructor method called when creating an object', 'Initializes Python', 'Imports modules', 'Defines constants'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: '__init__ is called automatically when a new instance is created.' }),
+      new Question({ id: 'python_m7', technologyId: 'python', questionText: 'What does the self keyword represent?', options: ['Reference to the current instance', 'The class itself', 'A static reference', 'Global scope'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'self refers to the current instance of the class.' }),
+      new Question({ id: 'python_m8', technologyId: 'python', questionText: 'What is the purpose of **kwargs?', options: ['Allows passing variable number of keyword arguments', 'Creates a double pointer', 'Raises to power', 'Imports keywords'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: '**kwargs allows a function to accept any number of keyword arguments.' }),
+      new Question({ id: 'python_m9', technologyId: 'python', questionText: 'What is a lambda function?', options: ['An anonymous inline function', 'A Greek function', 'A recursive function', 'A class method'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Lambda functions are small anonymous functions defined with lambda keyword.' }),
+      new Question({ id: 'python_m10', technologyId: 'python', questionText: 'What is the Global Interpreter Lock (GIL)?', options: ['A mutex preventing multiple threads from executing Python bytecode simultaneously', 'A global variable', 'A locking mechanism for files', 'An import lock'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'GIL is a mutex that allows only one thread to execute Python bytecode at a time.' }),
+      new Question({ id: 'python_m11', technologyId: 'python', questionText: 'What is the purpose of with statement?', options: ['Context management for resource handling', 'Conditional statement', 'Loop statement', 'Import statement'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'with statement ensures proper resource management and cleanup.' }),
+      new Question({ id: 'python_m12', technologyId: 'python', questionText: 'What are dunder methods?', options: ['Double underscore methods like __init__', 'German methods', 'Debug methods', 'Documentation methods'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Dunder (double underscore) methods are special methods like __init__, __str__.' }),
+      new Question({ id: 'python_h1', technologyId: 'python', questionText: 'What is a metaclass in Python?', options: ['A class that defines how classes behave', 'A super class', 'A documentation class', 'A testing class'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Metaclasses are classes whose instances are classes; they control class creation.' }),
+      new Question({ id: 'python_h2', technologyId: 'python', questionText: 'What is the purpose of __slots__?', options: ['Explicitly declares data members, saving memory', 'Creates time slots', 'Defines constants', 'Creates animations'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: '__slots__ prevents creation of __dict__, saving memory for many instances.' }),
+      new Question({ id: 'python_h3', technologyId: 'python', questionText: 'What is the difference between @staticmethod and @classmethod?', options: ['staticmethod doesn\'t receive class, classmethod receives class as first argument', 'They are identical', 'staticmethod is faster', 'classmethod is deprecated'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: '@classmethod receives the class as first argument; @staticmethod is like a regular function.' }),
+      new Question({ id: 'python_h4', technologyId: 'python', questionText: 'What is the descriptor protocol?', options: ['Protocol for customizing attribute access via __get__, __set__, __delete__', 'A documentation standard', 'A network protocol', 'A file format'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Descriptors customize attribute access using __get__, __set__, and __delete__.' }),
+      new Question({ id: 'python_h5', technologyId: 'python', questionText: 'What is the Method Resolution Order (MRO)?', options: ['The order in which base classes are searched for methods', 'Method ranking', 'Import order', 'Execution order'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'MRO determines the order in which base classes are searched when looking for methods.' }),
+      new Question({ id: 'python_h6', technologyId: 'python', questionText: 'What is monkey patching?', options: ['Dynamically modifying a module or class at runtime', 'A testing technique', 'An optimization', 'A security feature'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Monkey patching is dynamically modifying code at runtime.' }),
+      new Question({ id: 'python_h7', technologyId: 'python', questionText: 'What is the purpose of asyncio?', options: ['Library for writing concurrent code with async/await', 'Asynchronous I/O operations', 'A testing framework', 'File operations'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'asyncio provides infrastructure for writing single-threaded concurrent code.' }),
+      new Question({ id: 'python_h8', technologyId: 'python', questionText: 'What is the __new__ method used for?', options: ['Creating a new instance before __init__', 'Creating new classes', 'Importing new modules', 'Defining new types'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: '__new__ is called to create an instance before __init__ initializes it.' }),
+      new Question({ id: 'python_h9', technologyId: 'python', questionText: 'What are coroutines in Python?', options: ['Functions that can pause and resume execution', 'Co-routines for routing', 'A testing feature', 'A multiprocessing tool'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Coroutines are functions that can suspend and resume, enabling async programming.' }),
+      new Question({ id: 'python_h10', technologyId: 'python', questionText: 'What is the purpose of __call__ method?', options: ['Makes an instance callable like a function', 'Calls another function', 'Phone call API', 'Imports modules'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: '__call__ allows an instance to be called as if it were a function.' }),
+      new Question({ id: 'python_h11', technologyId: 'python', questionText: 'What is a context manager?', options: ['Object managing resources with __enter__ and __exit__', 'A variable manager', 'An import manager', 'A memory manager'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Context managers implement __enter__ and __exit__ for resource management.' }),
+      new Question({ id: 'python_h12', technologyId: 'python', questionText: 'What is the purpose of __getattr__ vs __getattribute__?', options: ['__getattribute__ is called for every access, __getattr__ only when attribute not found', 'They are identical', '__getattr__ is deprecated', '__getattribute__ is faster'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: '__getattribute__ is called for all attribute access; __getattr__ only when not found.' }),
+    ];
+  }
+
+  static generateJavaScriptQuestions() {
+    return [
+      new Question({ id: 'js_e1', technologyId: 'javascript', questionText: 'Which keyword declares a block-scoped variable?', options: ['let', 'var', 'dim', 'variable'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'let declares a block-scoped variable.' }),
+      new Question({ id: 'js_e2', technologyId: 'javascript', questionText: 'What is the correct way to write a comment in JavaScript?', options: ['// comment', '# comment', '-- comment', '/* comment'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: '// is used for single-line comments in JavaScript.' }),
+      new Question({ id: 'js_e3', technologyId: 'javascript', questionText: 'What does === operator check?', options: ['Value and type equality', 'Only value equality', 'Only type equality', 'Reference equality'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: '=== checks both value and type equality (strict equality).' }),
+      new Question({ id: 'js_e4', technologyId: 'javascript', questionText: 'How do you create a function in JavaScript?', options: ['function name() {}', 'def name() {}', 'fn name() {}', 'func name() {}'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'function keyword is used to declare functions.' }),
+      new Question({ id: 'js_e5', technologyId: 'javascript', questionText: 'What is the output of typeof null?', options: ['object', 'null', 'undefined', 'none'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'typeof null returns "object" (a historical bug in JavaScript).' }),
+      new Question({ id: 'js_e6', technologyId: 'javascript', questionText: 'Which method adds an element to the end of an array?', options: ['push()', 'append()', 'add()', 'insert()'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'push() adds elements to the end of an array.' }),
+      new Question({ id: 'js_e7', technologyId: 'javascript', questionText: 'How do you access an object property?', options: ['Both dot and bracket notation', 'Only dot notation', 'Only bracket notation', 'Neither'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Both obj.property and obj["property"] work.' }),
+      new Question({ id: 'js_e8', technologyId: 'javascript', questionText: 'What is the default value of an uninitialized variable?', options: ['undefined', 'null', '0', 'empty'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Uninitialized variables have the value undefined.' }),
+      new Question({ id: 'js_e9', technologyId: 'javascript', questionText: 'Which method converts a string to a number?', options: ['parseInt()', 'toNumber()', 'convert()', 'cast()'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'parseInt() converts a string to an integer.' }),
+      new Question({ id: 'js_e10', technologyId: 'javascript', questionText: 'What does console.log() do?', options: ['Outputs messages to the console', 'Creates a log file', 'Logs in a user', 'Clears the console'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'console.log() outputs messages to the browser console.' }),
+      new Question({ id: 'js_e11', technologyId: 'javascript', questionText: 'How do you create an object in JavaScript?', options: ['{}', '[]', '()', '<>'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Curly braces {} create an object literal.' }),
+      new Question({ id: 'js_e12', technologyId: 'javascript', questionText: 'Which method returns the length of a string?', options: ['length', 'len()', 'size()', 'count()'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'The length property returns the length of a string.' }),
+      new Question({ id: 'js_m1', technologyId: 'javascript', questionText: 'What is a closure in JavaScript?', options: ['A function with access to its outer scope variables', 'A closed function', 'A private method', 'A sealed object'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Closures allow functions to access variables from their outer scope.' }),
+      new Question({ id: 'js_m2', technologyId: 'javascript', questionText: 'What is the difference between let and var?', options: ['let is block-scoped, var is function-scoped', 'They are identical', 'var is deprecated', 'let is faster'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'let has block scope; var has function scope and is hoisted.' }),
+      new Question({ id: 'js_m3', technologyId: 'javascript', questionText: 'What is the purpose of the spread operator (...)?', options: ['Expands iterables into individual elements', 'Spreads values', 'Creates ranges', 'Defines rest parameters'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Spread operator expands an iterable into individual elements.' }),
+      new Question({ id: 'js_m4', technologyId: 'javascript', questionText: 'What is a Promise in JavaScript?', options: ['Object representing eventual completion of async operation', 'A commitment', 'A callback', 'A timer'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Promises represent the eventual completion or failure of an async operation.' }),
+      new Question({ id: 'js_m5', technologyId: 'javascript', questionText: 'What does async/await do?', options: ['Makes asynchronous code look synchronous', 'Creates threads', 'Speeds up execution', 'Handles errors'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'async/await provides a cleaner syntax for working with Promises.' }),
+      new Question({ id: 'js_m6', technologyId: 'javascript', questionText: 'What is destructuring in JavaScript?', options: ['Extracting values from arrays or objects into variables', 'Destroying objects', 'Memory cleanup', 'Error handling'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Destructuring unpacks values from arrays or properties from objects.' }),
+      new Question({ id: 'js_m7', technologyId: 'javascript', questionText: 'What is the purpose of Array.map()?', options: ['Creates new array with results of calling function on each element', 'Creates a map', 'Finds elements', 'Filters elements'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'map() creates a new array by transforming each element.' }),
+      new Question({ id: 'js_m8', technologyId: 'javascript', questionText: 'What is hoisting in JavaScript?', options: ['Variables and functions are moved to top of scope', 'Lifting elements', 'Memory optimization', 'Code optimization'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Hoisting moves variable and function declarations to the top of their scope.' }),
+      new Question({ id: 'js_m9', technologyId: 'javascript', questionText: 'What is the this keyword?', options: ['Reference to the current execution context', 'The current file', 'The window object', 'The document'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'this refers to the object that is executing the current function.' }),
+      new Question({ id: 'js_m10', technologyId: 'javascript', questionText: 'What is the difference between null and undefined?', options: ['undefined means not assigned, null is intentional absence', 'They are identical', 'null is an error', 'undefined is deprecated'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'undefined means not assigned; null is intentional absence of value.' }),
+      new Question({ id: 'js_m11', technologyId: 'javascript', questionText: 'What is an arrow function?', options: ['Compact syntax for functions with lexical this', 'A pointer function', 'A callback', 'A generator'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Arrow functions are shorter syntax with lexical this binding.' }),
+      new Question({ id: 'js_m12', technologyId: 'javascript', questionText: 'What does Array.filter() do?', options: ['Creates new array with elements that pass a test', 'Removes duplicates', 'Sorts array', 'Finds one element'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'filter() creates a new array with elements that pass the provided test.' }),
+      new Question({ id: 'js_h1', technologyId: 'javascript', questionText: 'What is the event loop in JavaScript?', options: ['Mechanism handling async callbacks in single-threaded environment', 'A for loop', 'An event handler', 'A timer'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'The event loop processes callbacks from the task queue when the call stack is empty.' }),
+      new Question({ id: 'js_h2', technologyId: 'javascript', questionText: 'What is prototypal inheritance?', options: ['Objects inherit directly from other objects', 'Class-based inheritance', 'Multiple inheritance', 'Single inheritance'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'In prototypal inheritance, objects inherit directly from other objects.' }),
+      new Question({ id: 'js_h3', technologyId: 'javascript', questionText: 'What is the difference between call, apply, and bind?', options: ['call/apply invoke immediately with different arg syntax, bind returns new function', 'They are identical', 'bind is deprecated', 'apply is faster'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'call uses arguments list, apply uses array, bind returns a new bound function.' }),
+      new Question({ id: 'js_h4', technologyId: 'javascript', questionText: 'What is a WeakMap?', options: ['Map with weak references to keys allowing garbage collection', 'A weak hash', 'A small map', 'A deprecated map'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'WeakMap holds weak references to keys, allowing garbage collection.' }),
+      new Question({ id: 'js_h5', technologyId: 'javascript', questionText: 'What are generators in JavaScript?', options: ['Functions that can pause and resume with yield', 'Random number generators', 'Code generators', 'ID generators'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Generators are functions that can be paused and resumed using yield.' }),
+      new Question({ id: 'js_h6', technologyId: 'javascript', questionText: 'What is the Proxy object used for?', options: ['Creating custom behavior for object operations', 'Network proxy', 'API proxy', 'Event delegation'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Proxy allows you to define custom behavior for fundamental operations.' }),
+      new Question({ id: 'js_h7', technologyId: 'javascript', questionText: 'What is the Symbol primitive type?', options: ['Unique and immutable identifier', 'A unicode character', 'A constant', 'A string type'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Symbols are unique, immutable identifiers often used as object keys.' }),
+      new Question({ id: 'js_h8', technologyId: 'javascript', questionText: 'What is memoization?', options: ['Caching function results for performance', 'Memory allocation', 'Memorizing code', 'Debugging technique'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Memoization caches function results to avoid redundant calculations.' }),
+      new Question({ id: 'js_h9', technologyId: 'javascript', questionText: 'What is the temporal dead zone?', options: ['Period between entering scope and variable initialization for let/const', 'A time zone', 'A dead code area', 'An unreachable zone'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'TDZ is the time between entering scope and variable initialization.' }),
+      new Question({ id: 'js_h10', technologyId: 'javascript', questionText: 'What is currying?', options: ['Transforming function with multiple args into sequence of single-arg functions', 'A cooking term', 'Error handling', 'Optimization'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Currying transforms a function to accept arguments one at a time.' }),
+      new Question({ id: 'js_h11', technologyId: 'javascript', questionText: 'What is the Reflect API?', options: ['Built-in object providing methods for interceptable operations', 'A mirror API', 'A debugging API', 'A testing API'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Reflect provides methods for interceptable JavaScript operations.' }),
+      new Question({ id: 'js_h12', technologyId: 'javascript', questionText: 'What is tree shaking?', options: ['Removing unused code during bundling', 'A data structure operation', 'Memory cleanup', 'Garbage collection'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Tree shaking eliminates dead code from the final bundle.' }),
+    ];
+  }
+
+  static generateGenericQuestions(techId, techName) {
+    return [
+      new Question({ id: `${techId}_e1`, technologyId: techId, questionText: `What is ${techName} primarily used for?`, options: ['Building software applications', 'Hardware design', 'Network configuration', 'Database administration only'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: `${techName} is a technology used for building software applications.` }),
+      new Question({ id: `${techId}_e2`, technologyId: techId, questionText: `Which of the following is a core feature of ${techName}?`, options: ['Code reusability', 'Physical computing', 'Network routing', 'Hardware acceleration'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: `Code reusability is a fundamental feature of ${techName}.` }),
+      new Question({ id: `${techId}_e3`, technologyId: techId, questionText: `What type of technology is ${techName}?`, options: ['Software development tool', 'Operating system', 'Hardware driver', 'Network protocol'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: `${techName} is a software development technology.` }),
+      new Question({ id: `${techId}_e4`, technologyId: techId, questionText: `What is a common use case for ${techName}?`, options: ['Application development', 'Chip manufacturing', 'Cable installation', 'Power management'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: `${techName} is commonly used for application development.` }),
+      new Question({ id: `${techId}_e5`, technologyId: techId, questionText: `Which skill is essential when working with ${techName}?`, options: ['Problem-solving', 'Soldering', 'Network cabling', 'Hardware repair'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: `Problem-solving is essential for working with ${techName}.` }),
+      new Question({ id: `${techId}_e6`, technologyId: techId, questionText: `What is important when learning ${techName}?`, options: ['Practice and consistency', 'Expensive equipment', 'Physical training', 'Advanced mathematics only'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: `Practice and consistency are key to learning ${techName}.` }),
+      new Question({ id: `${techId}_e7`, technologyId: techId, questionText: `How can you improve your skills in ${techName}?`, options: ['Building projects', 'Memorizing documentation', 'Avoiding practice', 'Only reading theory'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Building projects is the best way to improve skills.' }),
+      new Question({ id: `${techId}_e8`, technologyId: techId, questionText: `What resource is helpful for learning ${techName}?`, options: ['Official documentation', 'Cooking recipes', 'Sports guides', 'Music tutorials'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Official documentation is the best resource for learning.' }),
+      new Question({ id: `${techId}_e9`, technologyId: techId, questionText: `Which community resource helps with ${techName}?`, options: ['Developer forums', 'Cooking communities', 'Sports clubs', 'Music groups'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Developer forums provide great community support.' }),
+      new Question({ id: `${techId}_e10`, technologyId: techId, questionText: `What mindset helps when learning ${techName}?`, options: ['Growth mindset', 'Fixed mindset', 'Avoiding challenges', 'Fear of failure'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'A growth mindset helps in learning new technologies.' }),
+      new Question({ id: `${techId}_e11`, technologyId: techId, questionText: `What is debugging in ${techName}?`, options: ['Finding and fixing errors', 'Adding bugs', 'Removing features', 'Slowing down code'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Debugging is the process of finding and fixing errors.' }),
+      new Question({ id: `${techId}_e12`, technologyId: techId, questionText: `Why is version control important in ${techName}?`, options: ['Track changes and collaborate', 'Slow down development', 'Make code private only', 'Remove old code'], correctAnswers: [0], difficulty: QuestionDifficulty.EASY, explanation: 'Version control helps track changes and enables collaboration.' }),
+      new Question({ id: `${techId}_m1`, technologyId: techId, questionText: `What is a best practice when writing code in ${techName}?`, options: ['Write clean, readable code', 'Write as fast as possible', 'Ignore error handling', 'Avoid comments'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Clean, readable code is a fundamental best practice.' }),
+      new Question({ id: `${techId}_m2`, technologyId: techId, questionText: `What is refactoring in ${techName}?`, options: ['Improving code structure without changing behavior', 'Adding new features', 'Removing all code', 'Changing programming language'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Refactoring improves code structure while maintaining functionality.' }),
+      new Question({ id: `${techId}_m3`, technologyId: techId, questionText: `Why are tests important in ${techName} development?`, options: ['Ensure code works correctly', 'Slow down deployment', 'Add complexity', 'Make code slower'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Tests verify that code works as expected.' }),
+      new Question({ id: `${techId}_m4`, technologyId: techId, questionText: `What is code review in ${techName}?`, options: ['Peer examination of code for quality', 'Automatic code generation', 'Deleting code', 'Copying code'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Code review is peer examination to ensure quality.' }),
+      new Question({ id: `${techId}_m5`, technologyId: techId, questionText: 'What is the DRY principle?', options: ["Don't Repeat Yourself", 'Do Repeat Yourself', 'Delete Redundant Yields', 'Dry Run Yesterday'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'DRY means avoiding code duplication.' }),
+      new Question({ id: `${techId}_m6`, technologyId: techId, questionText: 'What is SOLID in software development?', options: ['Design principles for maintainable code', 'A type of data', 'A testing framework', 'A deployment tool'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'SOLID is a set of design principles for maintainable code.' }),
+      new Question({ id: `${techId}_m7`, technologyId: techId, questionText: 'What is technical debt?', options: ['Cost of shortcuts in code', 'Financial debt', 'Hardware cost', 'License fees'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Technical debt is the cost of taking shortcuts in development.' }),
+      new Question({ id: `${techId}_m8`, technologyId: techId, questionText: 'What is continuous integration?', options: ['Frequently merging code changes', 'Never merging code', 'Manual deployments', 'Isolated development'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'CI involves frequently integrating code changes.' }),
+      new Question({ id: `${techId}_m9`, technologyId: techId, questionText: 'What is the purpose of documentation?', options: ['Explain how code works', 'Hide code functionality', 'Slow development', 'Increase bugs'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Documentation explains how code works and how to use it.' }),
+      new Question({ id: `${techId}_m10`, technologyId: techId, questionText: 'What is pair programming?', options: ['Two developers coding together', 'Coding alone', 'Automatic coding', 'Code generation'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Pair programming involves two developers working together.' }),
+      new Question({ id: `${techId}_m11`, technologyId: techId, questionText: 'What is agile development?', options: ['Iterative development approach', 'Waterfall approach', 'No planning', 'One-time delivery'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Agile is an iterative approach to software development.' }),
+      new Question({ id: `${techId}_m12`, technologyId: techId, questionText: 'What is a code smell?', options: ['Indicator of potential problems', 'Good code practice', 'Performance optimization', 'Security feature'], correctAnswers: [0], difficulty: QuestionDifficulty.MEDIUM, explanation: 'Code smells indicate potential problems in the code.' }),
+      new Question({ id: `${techId}_h1`, technologyId: techId, questionText: `What is design pattern in ${techName}?`, options: ['Reusable solution to common problems', 'UI design', 'Database schema', 'Network topology'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Design patterns are reusable solutions to common problems.' }),
+      new Question({ id: `${techId}_h2`, technologyId: techId, questionText: 'What is scalability in software?', options: ['Ability to handle growth', 'Fixed capacity', 'Reducing features', 'Limiting users'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Scalability is the ability to handle increased load.' }),
+      new Question({ id: `${techId}_h3`, technologyId: techId, questionText: 'What is microservices architecture?', options: ['Small, independent services', 'One large application', 'Desktop software', 'Hardware design'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Microservices break applications into small, independent services.' }),
+      new Question({ id: `${techId}_h4`, technologyId: techId, questionText: 'What is API in software development?', options: ['Interface for software interaction', 'A programming language', 'A database', 'An operating system'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'API is an interface that allows software components to interact.' }),
+      new Question({ id: `${techId}_h5`, technologyId: techId, questionText: 'What is load balancing?', options: ['Distributing work across servers', 'Increasing server load', 'Single server usage', 'Reducing capacity'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Load balancing distributes workload across multiple servers.' }),
+      new Question({ id: `${techId}_h6`, technologyId: techId, questionText: 'What is caching?', options: ['Storing data for faster access', 'Deleting data', 'Encrypting data', 'Compressing data'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Caching stores frequently accessed data for faster retrieval.' }),
+      new Question({ id: `${techId}_h7`, technologyId: techId, questionText: 'What is containerization?', options: ['Packaging apps with dependencies', 'Physical containers', 'Data storage', 'Network segmentation'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Containerization packages applications with their dependencies.' }),
+      new Question({ id: `${techId}_h8`, technologyId: techId, questionText: 'What is DevOps?', options: ['Combining development and operations', 'Development only', 'Operations only', 'Testing only'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'DevOps combines development and operations practices.' }),
+      new Question({ id: `${techId}_h9`, technologyId: techId, questionText: 'What is infrastructure as code?', options: ['Managing infrastructure through code', 'Manual configuration', 'Hardware only', 'Network cables'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'IaC manages infrastructure using code and automation.' }),
+      new Question({ id: `${techId}_h10`, technologyId: techId, questionText: 'What is observability in systems?', options: ['Understanding internal state from outputs', 'Hiding system state', 'Reducing logs', 'Ignoring metrics'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Observability is understanding system state through outputs.' }),
+      new Question({ id: `${techId}_h11`, technologyId: techId, questionText: 'What is fault tolerance?', options: ['Continuing operation despite failures', 'Stopping on any error', 'Ignoring errors', 'No error handling'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Fault tolerance allows systems to continue operating despite failures.' }),
+      new Question({ id: `${techId}_h12`, technologyId: techId, questionText: 'What is eventual consistency?', options: ['Data becoming consistent over time', 'Immediate consistency', 'No consistency', 'Random consistency'], correctAnswers: [0], difficulty: QuestionDifficulty.HARD, explanation: 'Eventual consistency means data will become consistent over time.' }),
+    ];
+  }
+
+  getQuestionsForTechnology(techId) {
+    return QuestionBank.questions[techId] || [];
+  }
+}
+
+class ProgrammingQuizApp {
+  constructor() {
+    this.techDatasource = new TechnologyDatasource();
+    this.questionBank = new QuestionBank();
+    this.currentQuestions = [];
+    this.currentQuestionIndex = 0;
+    this.userAnswers = {};
+    this.currentTechId = '';
+    this.currentTechName = '';
+    this.startTime = null;
+    this.timer = null;
+    this.timeRemaining = 30;
+    this.timerEnabled = true;
+  }
+
+  run() {
+    this.renderHomePage();
+  }
+
+  renderHomePage() {
+    const container = document.getElementById('app');
+    const technologies = this.techDatasource.getAllTechnologies();
+
+    container.innerHTML = `
+      <div class="app-container">
+        <header class="header">
+          <h1 class="logo">🧠 Programming Quiz</h1>
+          <p class="tagline">Test your programming knowledge with AI-powered quizzes</p>
+        </header>
+        
+        <main class="main-content">
+          <section class="hero">
+            <h2>Choose a Technology</h2>
+            <p>Select a programming language or technology to start your quiz</p>
+          </section>
+          
+          <div class="cards-grid" id="cards-container"></div>
+        </main>
+        
+        <footer class="footer">
+          <p>Built with Clean Architecture • AI-Powered Analysis</p>
+        </footer>
+      </div>
+    `;
+
+    const cardsContainer = document.getElementById('cards-container');
+    technologies.forEach(tech => {
+      const card = this.createTechCard(tech);
+      cardsContainer.appendChild(card);
+    });
+  }
+
+  createTechCard(tech) {
+    const card = document.createElement('div');
+    card.className = 'tech-card';
+    card.dataset.techId = tech.id;
+
+    const difficultyClass = tech.difficulty === Difficulty.BEGINNER
+      ? 'difficulty-beginner'
+      : tech.difficulty === Difficulty.INTERMEDIATE
+        ? 'difficulty-intermediate'
+        : 'difficulty-advanced';
+
+    const difficultyText = tech.difficulty === Difficulty.BEGINNER
+      ? 'Beginner'
+      : tech.difficulty === Difficulty.INTERMEDIATE
+        ? 'Intermediate'
+        : 'Advanced';
+
+    card.innerHTML = `
+      <div class="card-icon">${tech.icon}</div>
+      <h3 class="card-title">${tech.name}</h3>
+      <p class="card-description">${tech.description}</p>
+      <span class="difficulty-badge ${difficultyClass}">${difficultyText}</span>
+      <div class="card-footer">
+        <span class="question-count">30 Questions</span>
+        <button class="start-btn">Start Quiz →</button>
+      </div>
+    `;
+
+    card.querySelector('.start-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.startQuiz(tech);
+    });
+
+    card.addEventListener('click', () => {
+      this.startQuiz(tech);
+    });
+
+    return card;
+  }
+
+  startQuiz(tech) {
+    this.currentTechId = tech.id;
+    this.currentTechName = tech.name;
+    this.currentQuestionIndex = 0;
+    this.userAnswers = {};
+    this.startTime = new Date();
+    this.timeRemaining = 30;
+
+    const allQuestions = this.questionBank.getQuestionsForTechnology(tech.id);
+    const easyQuestions = this.shuffleArray(allQuestions.filter(q => q.difficulty === QuestionDifficulty.EASY));
+    const mediumQuestions = this.shuffleArray(allQuestions.filter(q => q.difficulty === QuestionDifficulty.MEDIUM));
+    const hardQuestions = this.shuffleArray(allQuestions.filter(q => q.difficulty === QuestionDifficulty.HARD));
+
+    this.currentQuestions = this.shuffleArray([
+      ...easyQuestions.slice(0, 10),
+      ...mediumQuestions.slice(0, 10),
+      ...hardQuestions.slice(0, 10),
+    ]);
+
+    this.renderQuizPage();
+  }
+
+  shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }
+
+  renderQuizPage() {
+    if (this.currentQuestions.length === 0) return;
+
+    const container = document.getElementById('app');
+    const question = this.currentQuestions[this.currentQuestionIndex];
+    const progress = ((this.currentQuestionIndex + 1) / this.currentQuestions.length * 100).toFixed(0);
+
+    const difficultyClass = question.difficulty === QuestionDifficulty.EASY
+      ? 'difficulty-beginner'
+      : question.difficulty === QuestionDifficulty.MEDIUM
+        ? 'difficulty-intermediate'
+        : 'difficulty-advanced';
+
+    const difficultyText = question.difficulty === QuestionDifficulty.EASY
+      ? 'Easy'
+      : question.difficulty === QuestionDifficulty.MEDIUM
+        ? 'Medium'
+        : 'Hard';
+
+    container.innerHTML = `
+      <div class="quiz-container">
+        <header class="quiz-header">
+          <button class="back-btn" id="back-btn">← Back</button>
+          <div class="quiz-info">
+            <h2>${this.currentTechName} Quiz</h2>
+            <div class="progress-container">
+              <div class="progress-bar" style="width: ${progress}%"></div>
+            </div>
+            <span class="progress-text">Question ${this.currentQuestionIndex + 1} of ${this.currentQuestions.length}</span>
+          </div>
+          <div class="timer-section">
+            <label class="timer-toggle">
+              <input type="checkbox" id="timer-toggle" ${this.timerEnabled ? 'checked' : ''}>
+              <span>Timer</span>
+            </label>
+            <div class="timer ${this.timerEnabled ? '' : 'timer-disabled'}" id="timer">
+              <span id="timer-value">${this.timeRemaining}</span>s
+            </div>
+          </div>
+        </header>
+
+        <main class="quiz-main">
+          <div class="question-card">
+            <div class="question-header">
+              <span class="question-number">Q${this.currentQuestionIndex + 1}</span>
+              <span class="difficulty-badge ${difficultyClass}">${difficultyText}</span>
+              ${question.isMultipleChoice ? '<span class="multi-select-badge">Multiple Answers</span>' : ''}
+            </div>
+            
+            <h3 class="question-text">${this.escapeHtml(question.questionText)}</h3>
+            
+            ${question.codeSnippet ? `<pre class="code-snippet"><code>${this.escapeHtml(question.codeSnippet)}</code></pre>` : ''}
+            
+            <div class="options-container" id="options-container"></div>
+          </div>
+          
+          <div class="question-nav" id="question-nav"></div>
+        </main>
+
+        <footer class="quiz-footer">
+          <button class="nav-btn prev-btn" id="prev-btn" ${this.currentQuestionIndex === 0 ? 'disabled' : ''}>← Previous</button>
+          <button class="nav-btn next-btn" id="next-btn">
+            ${this.currentQuestionIndex === this.currentQuestions.length - 1 ? 'Finish Quiz' : 'Next →'}
+          </button>
+        </footer>
+      </div>
+    `;
+
+    const optionsContainer = document.getElementById('options-container');
+    question.options.forEach((option, index) => {
+      const isSelected = this.userAnswers[this.currentQuestionIndex]?.includes(index) || false;
+      const optionEl = this.createOptionElement(index, option, isSelected, question.isMultipleChoice);
+      optionsContainer.appendChild(optionEl);
+    });
+
+    const questionNav = document.getElementById('question-nav');
+    for (let i = 0; i < this.currentQuestions.length; i++) {
+      const navBtn = document.createElement('button');
+      navBtn.className = 'nav-dot';
+      navBtn.textContent = i + 1;
+
+      if (i === this.currentQuestionIndex) {
+        navBtn.classList.add('current');
+      } else if (this.userAnswers[i]) {
+        navBtn.classList.add('answered');
+      }
+
+      navBtn.addEventListener('click', () => {
+        this.currentQuestionIndex = i;
+        this.resetTimer();
+        this.renderQuizPage();
+      });
+
+      questionNav.appendChild(navBtn);
+    }
+
+    document.getElementById('back-btn').addEventListener('click', () => {
+      if (this.timer) clearInterval(this.timer);
+      this.renderHomePage();
+    });
+
+    document.getElementById('timer-toggle').addEventListener('change', (e) => {
+      this.timerEnabled = e.target.checked;
+      if (this.timerEnabled) {
+        this.startTimer();
+      } else if (this.timer) {
+        clearInterval(this.timer);
+      }
+      this.renderQuizPage();
+    });
+
+    document.getElementById('prev-btn').addEventListener('click', () => {
+      if (this.currentQuestionIndex > 0) {
+        this.currentQuestionIndex--;
+        this.resetTimer();
+        this.renderQuizPage();
+      }
+    });
+
+    document.getElementById('next-btn').addEventListener('click', () => {
+      if (this.currentQuestionIndex < this.currentQuestions.length - 1) {
+        this.currentQuestionIndex++;
+        this.resetTimer();
+        this.renderQuizPage();
+      } else {
+        this.finishQuiz();
+      }
+    });
+
+    if (this.timerEnabled) {
+      this.startTimer();
+    }
+  }
+
+  createOptionElement(index, text, isSelected, isMultiple) {
+    const option = document.createElement('div');
+    option.className = 'option' + (isSelected ? ' selected' : '');
+    option.dataset.index = index;
+
+    option.innerHTML = `
+      <div class="option-checkbox ${isMultiple ? 'checkbox' : 'radio'} ${isSelected ? 'checked' : ''}"></div>
+      <span class="option-label">${String.fromCharCode(65 + index)}.</span>
+      <span class="option-text">${this.escapeHtml(text)}</span>
+    `;
+
+    option.addEventListener('click', () => {
+      this.selectAnswer(index);
+      this.renderQuizPage();
+    });
+
+    return option;
+  }
+
+  selectAnswer(answerIndex) {
+    if (!this.userAnswers[this.currentQuestionIndex]) {
+      this.userAnswers[this.currentQuestionIndex] = [];
+    }
+
+    const question = this.currentQuestions[this.currentQuestionIndex];
+    if (question.isMultipleChoice) {
+      const idx = this.userAnswers[this.currentQuestionIndex].indexOf(answerIndex);
+      if (idx > -1) {
+        this.userAnswers[this.currentQuestionIndex].splice(idx, 1);
+      } else {
+        this.userAnswers[this.currentQuestionIndex].push(answerIndex);
+      }
+    } else {
+      this.userAnswers[this.currentQuestionIndex] = [answerIndex];
+    }
+  }
+
+  startTimer() {
+    if (this.timer) clearInterval(this.timer);
+    this.timer = setInterval(() => {
+      this.timeRemaining--;
+      const timerElement = document.getElementById('timer-value');
+      if (timerElement) {
+        timerElement.textContent = this.timeRemaining;
+      }
+      if (this.timeRemaining <= 0) {
+        clearInterval(this.timer);
+        if (this.currentQuestionIndex < this.currentQuestions.length - 1) {
+          this.currentQuestionIndex++;
+          this.resetTimer();
+          this.renderQuizPage();
+        } else {
+          this.finishQuiz();
+        }
+      }
+    }, 1000);
+  }
+
+  resetTimer() {
+    if (this.timer) clearInterval(this.timer);
+    this.timeRemaining = 30;
+  }
+
+  finishQuiz() {
+    if (this.timer) clearInterval(this.timer);
+    const endTime = new Date();
+    const timeTaken = endTime - this.startTime;
+
+    let correctAnswers = 0;
+    let easyCorrect = 0;
+    let mediumCorrect = 0;
+    let hardCorrect = 0;
+
+    const questionResults = [];
+
+    this.currentQuestions.forEach((question, i) => {
+      const userAnswer = this.userAnswers[i] || [];
+      const isCorrect = question.checkAnswer(userAnswer);
+
+      if (isCorrect) {
+        correctAnswers++;
+        if (question.difficulty === QuestionDifficulty.EASY) easyCorrect++;
+        else if (question.difficulty === QuestionDifficulty.MEDIUM) mediumCorrect++;
+        else hardCorrect++;
+      }
+
+      questionResults.push({
+        question,
+        userAnswers: userAnswer,
+        isCorrect
+      });
+    });
+
+    const result = {
+      technologyId: this.currentTechId,
+      technologyName: this.currentTechName,
+      questionResults,
+      totalQuestions: this.currentQuestions.length,
+      correctAnswers,
+      easyCorrect,
+      mediumCorrect,
+      hardCorrect,
+      timeTaken,
+      completedAt: endTime,
+      percentage: (correctAnswers / this.currentQuestions.length) * 100,
+      grade: this.calculateGrade((correctAnswers / this.currentQuestions.length) * 100)
+    };
+
+    this.renderResultsPage(result);
+  }
+
+  calculateGrade(percentage) {
+    if (percentage >= 90) return 'A+';
+    if (percentage >= 80) return 'A';
+    if (percentage >= 70) return 'B';
+    if (percentage >= 60) return 'C';
+    if (percentage >= 50) return 'D';
+    return 'F';
+  }
+
+  renderResultsPage(result) {
+    const container = document.getElementById('app');
+    const percentage = result.percentage.toFixed(1);
+    const gradeClass = result.grade === 'A+' || result.grade === 'A'
+      ? 'grade-excellent'
+      : result.grade === 'B'
+        ? 'grade-good'
+        : result.grade === 'C'
+          ? 'grade-average'
+          : 'grade-poor';
+
+    container.innerHTML = `
+      <div class="results-container">
+        <header class="results-header">
+          <h1>Quiz Complete! 🎉</h1>
+          <p>${result.technologyName} Assessment Results</p>
+        </header>
+
+        <main class="results-main">
+          <div class="score-card">
+            <div class="score-circle">
+              <div class="score-value">${percentage}%</div>
+              <div class="score-label">Score</div>
+            </div>
+            <div class="grade-badge ${gradeClass}">${result.grade}</div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">✅</div>
+              <div class="stat-value">${result.correctAnswers}</div>
+              <div class="stat-label">Correct</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">❌</div>
+              <div class="stat-value">${result.totalQuestions - result.correctAnswers}</div>
+              <div class="stat-label">Incorrect</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">⏱️</div>
+              <div class="stat-value">${this.formatDuration(result.timeTaken)}</div>
+              <div class="stat-label">Time</div>
+            </div>
+          </div>
+
+          <div class="difficulty-breakdown">
+            <h3>Performance by Difficulty</h3>
+            <div class="breakdown-grid">
+              <div class="breakdown-item">
+                <span class="difficulty-badge difficulty-beginner">Easy</span>
+                <div class="breakdown-bar">
+                  <div class="breakdown-fill easy-fill" style="width: ${(result.easyCorrect / 10 * 100).toFixed(0)}%"></div>
+                </div>
+                <span class="breakdown-score">${result.easyCorrect}/10</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="difficulty-badge difficulty-intermediate">Medium</span>
+                <div class="breakdown-bar">
+                  <div class="breakdown-fill medium-fill" style="width: ${(result.mediumCorrect / 10 * 100).toFixed(0)}%"></div>
+                </div>
+                <span class="breakdown-score">${result.mediumCorrect}/10</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="difficulty-badge difficulty-advanced">Hard</span>
+                <div class="breakdown-bar">
+                  <div class="breakdown-fill hard-fill" style="width: ${(result.hardCorrect / 10 * 100).toFixed(0)}%"></div>
+                </div>
+                <span class="breakdown-score">${result.hardCorrect}/10</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-analysis" id="ai-analysis">
+            <h3>🤖 AI Skill Analysis</h3>
+            <div class="analysis-loading" id="analysis-loading">
+              <div class="spinner"></div>
+              <p>Analyzing your performance...</p>
+            </div>
+            <div class="analysis-content" id="analysis-content" style="display: none;"></div>
+          </div>
+
+          <div class="review-section">
+            <h3>📋 Question Review</h3>
+            <div class="review-list" id="review-list"></div>
+          </div>
+        </main>
+
+        <footer class="results-footer">
+          <button class="btn btn-primary" id="retry-btn">Try Again</button>
+          <button class="btn btn-secondary" id="home-btn">Back to Home</button>
+        </footer>
+      </div>
+    `;
+
+    const reviewList = document.getElementById('review-list');
+    result.questionResults.forEach((qr, i) => {
+      const reviewItem = this.createReviewItem(i, qr);
+      reviewList.appendChild(reviewItem);
+    });
+
+    document.getElementById('retry-btn').addEventListener('click', () => {
+      const tech = this.techDatasource.getTechnologyById(this.currentTechId);
+      if (tech) this.startQuiz(tech);
+    });
+
+    document.getElementById('home-btn').addEventListener('click', () => {
+      this.renderHomePage();
+    });
+
+    this.fetchAIAnalysis(result);
+  }
+
+  createReviewItem(index, qr) {
+    const item = document.createElement('div');
+    item.className = 'review-item ' + (qr.isCorrect ? 'correct' : 'incorrect');
+
+    const userAnswerText = qr.userAnswers.length === 0
+      ? 'Not answered'
+      : qr.userAnswers.map(i => qr.question.options[i]).join(', ');
+    const correctAnswerText = qr.question.correctAnswers.map(i => qr.question.options[i]).join(', ');
+
+    item.innerHTML = `
+      <div class="review-header">
+        <span class="review-number">Q${index + 1}</span>
+        <span class="review-status">${qr.isCorrect ? '✅ Correct' : '❌ Incorrect'}</span>
+      </div>
+      <p class="review-question">${this.escapeHtml(qr.question.questionText)}</p>
+      <div class="review-answers">
+        <p><strong>Your answer:</strong> ${this.escapeHtml(userAnswerText)}</p>
+        ${!qr.isCorrect ? `<p><strong>Correct answer:</strong> ${this.escapeHtml(correctAnswerText)}</p>` : ''}
+      </div>
+      <p class="review-explanation"><strong>Explanation:</strong> ${this.escapeHtml(qr.question.explanation)}</p>
+    `;
+
+    return item;
+  }
+
+  async fetchAIAnalysis(result) {
+    try {
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          technologyName: result.technologyName,
+          totalQuestions: result.totalQuestions,
+          correctAnswers: result.correctAnswers,
+          easyCorrect: result.easyCorrect,
+          mediumCorrect: result.mediumCorrect,
+          hardCorrect: result.hardCorrect,
+          percentage: result.percentage,
+          timeTaken: Math.floor(result.timeTaken / 1000),
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        this.displayAnalysis(data);
+      } else {
+        this.displayFallbackAnalysis(result);
+      }
+    } catch (e) {
+      this.displayFallbackAnalysis(result);
+    }
+  }
+
+  displayAnalysis(data) {
+    const loadingElement = document.getElementById('analysis-loading');
+    const contentElement = document.getElementById('analysis-content');
+
+    if (loadingElement) loadingElement.style.display = 'none';
+    if (contentElement) {
+      contentElement.style.display = 'block';
+
+      const strengths = (data.strengths || []).map(s => `<li>${this.escapeHtml(s)}</li>`).join('');
+      const weaknesses = (data.weaknesses || []).map(w => `<li>${this.escapeHtml(w)}</li>`).join('');
+
+      contentElement.innerHTML = `
+        <div class="skill-level">
+          <span class="skill-label">Skill Level:</span>
+          <span class="skill-badge">${data.skillLevel || 'Unknown'}</span>
+        </div>
+        <p class="analysis-text">${data.analysis || 'Analysis not available.'}</p>
+        ${strengths ? `<div class="strengths"><h4>💪 Strengths</h4><ul>${strengths}</ul></div>` : ''}
+        ${weaknesses ? `<div class="weaknesses"><h4>📈 Areas to Improve</h4><ul>${weaknesses}</ul></div>` : ''}
+      `;
+    }
+  }
+
+  displayFallbackAnalysis(result) {
+    const percentage = result.percentage;
+    let skillLevel;
+    let strengths = [];
+    let weaknesses = [];
+    let analysis;
+
+    if (percentage >= 90) {
+      skillLevel = 'Expert';
+      analysis = `Outstanding performance on the ${result.technologyName} quiz! You've demonstrated mastery of both fundamental and advanced concepts.`;
+      strengths = ['Excellent understanding of core concepts', 'Strong problem-solving skills'];
+    } else if (percentage >= 70) {
+      skillLevel = 'Advanced';
+      analysis = `Great job on the ${result.technologyName} quiz! You have a solid grasp of the fundamentals.`;
+      strengths = ['Good understanding of fundamentals', 'Solid practical knowledge'];
+      weaknesses = ['Some advanced concepts need review'];
+    } else if (percentage >= 50) {
+      skillLevel = 'Intermediate';
+      analysis = `Good effort on the ${result.technologyName} quiz! Continue building your knowledge.`;
+      strengths = ['Understanding of basic concepts'];
+      weaknesses = ['Medium and hard topics need more practice'];
+    } else {
+      skillLevel = 'Beginner';
+      analysis = `Keep practicing ${result.technologyName}! Focus on the fundamentals first.`;
+      weaknesses = ['Focus on fundamentals', 'Regular practice recommended'];
+    }
+
+    if (result.easyCorrect >= 8) strengths.push('Strong foundation in basics');
+    if (result.hardCorrect >= 7) strengths.push('Excellent advanced knowledge');
+    if (result.easyCorrect < 5) weaknesses.push('Review fundamental concepts');
+    if (result.hardCorrect < 3) weaknesses.push('Practice more challenging problems');
+
+    this.displayAnalysis({
+      skillLevel,
+      analysis,
+      strengths: strengths.slice(0, 3),
+      weaknesses: weaknesses.slice(0, 3),
+    });
+  }
+
+  formatDuration(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}m ${seconds}s`;
+  }
+
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const app = new ProgrammingQuizApp();
+  app.run();
+});
